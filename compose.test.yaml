@@ -1,0 +1,23 @@
+name: fullstack-lab-authz-test
+
+# 認可 API 単体の結合テスト（Karate）用。実行: docker compose -f compose.test.yaml build && docker compose -f compose.test.yaml run --rm karate
+
+services:
+  karate:
+    build: ./karate
+    environment:
+      BASE_URL: http://authz:8080
+    volumes:
+      - ./karate:/karate:ro
+    depends_on:
+      authz:
+        condition: service_healthy
+
+  authz:
+    build: .
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s

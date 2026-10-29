@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: fullstack-lab Authorization API
+  version: 1.0.0
+  description: |
+    認可 API（PDP: Policy Decision Point）。「この主体は、この操作を、この対象に対してしてよいか」を判定する。
+    BFF からのみ呼ばれる内部サービス。判定ルールは認可 API 側の設定で管理する。
+servers:
+  - url: http://authz:8080
+    description: Docker Compose 内
+tags:
+  - name: decisions
+    description: 認可判定
+paths:
+  /authz/v1/decisions:
+    post:
+      tags: [decisions]
+      operationId: decide
+      summary: 認可判定
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DecisionRequest' }
+      responses:
+        '200':
+          description: 判定結果（拒否も 200 で返し、allowed で表す）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DecisionResponse' }
+components:
+  schemas:
+    UserType:
+      type: string
+      enum: [CUSTOMER, STAFF]
+      description: CUSTOMER = 一般利用者（マイページ）、STAFF = 社員
+    Subject:
+      type: object
+      description: 認可を判定される主体。BFF が検証済み JWT から組み立てる
+      required: [id, userType]
+      properties:
+        id: { type: string, description: IdP の sub }
+        userType: { $ref: '#/components/schemas/UserType' }
+        roles:
+          type: array
+          items: { type: string }
+          description: 社員のロール（Okta のグループ名）。一般利用者は空
+    Resource:
+      type: object
+      description: 操作対象。ownerId が null のときは「特定の所有者に限らない（全件）」を意味する
+      required: [type]
+      properties:
+        type: { type: string, example: task }
+        ownerId: { type: string, nullable: true }
+    DecisionRequest:
+      type: object
+      required: [subject, action, resource]
+      properties:
+        subject: { $ref: '#/components/schemas/Subject' }
+        action: { type: string, description: '「対象:操作」の形式', example: 'task:read' }
+        resource: { $ref: '#/components/schemas/Resource' }
+    DecisionResponse:
+      type: object
+      required: [allowed, reason]
+      properties:
+        allowed: { type: boolean }
+        reason: { type: string, description: 判定理由（ログと学習用。利用者には見せない） }

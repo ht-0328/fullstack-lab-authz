@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: authz
+  mvc:
+    # 入力エラーなども RFC 9457 (Problem Details) 形式で返す（API / BFF と同じ）
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+
+authz:
+  # 社員: Okta のグループ名 → 許可する操作
+  staff-role-permissions:
+    task-viewer: [ "task:list", "task:read" ]
+    task-admin: [ "task:list", "task:read", "task:create" ]
+  # 一般利用者: 自分のリソースに限って許可する操作。
+  # account:change-password は自分のアカウント（認証 API で管理）に対する操作。社員のアカウントは Okta 側で管理するためどのロールにも付けない
+  customer-actions: [ "task:list", "task:read", "task:create", "account:change-password" ]
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [requestId=%X{requestId:-}]"

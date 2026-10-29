@@ -1,0 +1,12 @@
+kotlin/com/example/fullstacklab/authzclient/apis/DecisionsApi.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/ApiAbstractions.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/ApiClient.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/PartConfig.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/RequestConfig.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/RequestMethod.kt
+kotlin/com/example/fullstacklab/authzclient/infrastructure/Serializer.kt
+kotlin/com/example/fullstacklab/authzclient/models/DecisionRequest.kt
+kotlin/com/example/fullstacklab/authzclient/models/DecisionResponse.kt
+kotlin/com/example/fullstacklab/authzclient/models/Resource.kt
+kotlin/com/example/fullstacklab/authzclient/models/Subject.kt
+kotlin/com/example/fullstacklab/authzclient/models/UserType.kt
