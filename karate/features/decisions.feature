@@ -17,10 +17,14 @@ Feature: 認可 API（契約 openapi/authz.yaml に沿った判定）
       | 一般利用者（全件）   | alice-id | CUSTOMER | []              | task:list   | null       | false   |
       | 一般利用者（登録）   | alice-id | CUSTOMER | []              | task:create | 'alice-id' | true    |
       | 一般利用者（削除）   | alice-id | CUSTOMER | []              | task:delete | 'alice-id' | false   |
+      | 一般利用者（完了・本人） | alice-id | CUSTOMER | []          | task:complete | 'alice-id' | true  |
+      | 一般利用者（完了・他人） | alice-id | CUSTOMER | []          | task:complete | 'bob-id'   | false |
       | task-viewer の社員   | carol-id | STAFF    | ['task-viewer'] | task:list   | null       | true    |
       | task-viewer の社員   | carol-id | STAFF    | ['task-viewer'] | task:read   | 'alice-id' | true    |
       | task-viewer の社員   | carol-id | STAFF    | ['task-viewer'] | task:create | 'carol-id' | false   |
       | task-admin の社員    | dave-id  | STAFF    | ['task-admin']  | task:create | 'dave-id'  | true    |
+      | task-viewer の社員（完了） | carol-id | STAFF | ['task-viewer'] | task:complete | 'alice-id' | false |
+      | task-admin の社員（完了）  | dave-id  | STAFF | ['task-admin']  | task:complete | 'alice-id' | true  |
       | 未知のロールの社員   | x-id     | STAFF    | ['unknown']     | task:list   | null       | false   |
       | ロールのない社員     | x-id     | STAFF    | []              | task:list   | null       | false   |
 

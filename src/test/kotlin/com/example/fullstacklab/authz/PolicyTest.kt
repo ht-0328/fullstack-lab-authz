@@ -9,9 +9,9 @@ class PolicyTest {
         PolicyProperties(
             staffRolePermissions = mapOf(
                 "task-viewer" to setOf("task:list", "task:read"),
-                "task-admin" to setOf("task:list", "task:read", "task:create"),
+                "task-admin" to setOf("task:list", "task:read", "task:create", "task:complete"),
             ),
-            customerActions = setOf("task:list", "task:read", "task:create"),
+            customerActions = setOf("task:list", "task:read", "task:create", "task:complete"),
         ),
     )
 
@@ -29,6 +29,13 @@ class PolicyTest {
     }
 
     @Test
+    fun `customer can complete only own tasks`() {
+        assertTrue(decide(alice, "task:complete", ownerId = "alice-id"))
+        assertFalse(decide(alice, "task:complete", ownerId = "bob-id"))
+        assertFalse(decide(alice, "task:complete", ownerId = null), "owner must be given for completion")
+    }
+
+    @Test
     fun `staff permissions come from roles`() {
         val viewer = Subject("carol-id", UserType.STAFF, setOf("task-viewer"))
         val admin = Subject("dave-id", UserType.STAFF, setOf("task-admin"))
@@ -36,6 +43,8 @@ class PolicyTest {
         assertTrue(decide(viewer, "task:read", ownerId = "alice-id"))
         assertFalse(decide(viewer, "task:create"))
         assertTrue(decide(admin, "task:create"))
+        assertFalse(decide(viewer, "task:complete", ownerId = "alice-id"))
+        assertTrue(decide(admin, "task:complete", ownerId = "alice-id"), "task-admin can complete anyone's task")
     }
 
     @Test
